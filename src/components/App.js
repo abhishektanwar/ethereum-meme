@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 import logo from '../logo.png';
 import './App.css';
+import Web3 from 'web3';
+
 
 const ipfsClient = require('ipfs-http-client')
 // connection to an ipfs node
 // const ipfs = ipfsClient('localhost','5001'{protocol:'http'})
 var ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 class App extends Component {
+
+  async componentWillMount() {
+    await this.loadWeb3()
+  }
+
   constructor(props){
     super(props);
     this.state={
@@ -14,7 +21,20 @@ class App extends Component {
       memeHash:'QmdygKgEmUECQCQhciBeRqEpaNPU81wSxoJbv9VQZGFaEY'
     };
   }
-
+// structure of object returned by window.ethereum and window.web3.currentProvider is similar.
+// window.ethereum is a subset of window.web3
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else{
+      window.alert('please use metamask')
+    }
+  }
 
   captureFile = (event) => {
     event.preventDefault()
