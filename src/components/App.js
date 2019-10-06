@@ -33,10 +33,11 @@ class App extends Component {
       const abi = meme.abi
       const address = networkData.address
 
-      const contract = web3.eth.Contract(abi , address)
+      const contract = new web3.eth.Contract(abi , address)
       this.setState({contract:contract})
       console.log(contract)
-      const memeHash = await contract.methods.get().call()
+      const memeeHash = await contract.methods.get().call()
+      this.setState({memeHash:memeeHash})
     }
     else{
       window.alert('contract not deployed to detected network')
@@ -92,11 +93,13 @@ class App extends Component {
 
     const results = await ipfs.add(this.state.buffer)
     console.log('ipfs results',results)
-    const Hash = results[0].hash
-    console.log(Hash)
-    this.setState({memeHash:Hash})
+    const memeHash = results[0].hash
+    console.log(memeHash)
+    // this.setState({memeHash:Hash})
     console.log(this.state.memeHash)
-
+    await this.state.contract.methods.set(memeHash).send({
+      from:this.state.eth_account
+    });
     
     // ipfs.add(this.state.buffer,(error,result) => {
     //   console.log('ipfs results',result)
